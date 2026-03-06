@@ -1,5 +1,6 @@
 from .database import Database
 from .models import Column
+from .utils import Utils
 
 class Table:
     def __init__(self, tablename, database):
@@ -22,7 +23,7 @@ class Table:
         except Exception:
             return None
         
-    def getTableColumnNames(self):
+    def getTableColumns(self):
         pragmareturn = self.database.queryExec(f"PRAGMA table_info({self.tablename});")
 
         if not pragmareturn:
@@ -30,8 +31,25 @@ class Table:
             
         datanames = []
         for namestuple in pragmareturn:
-            datanames.append(Column(namestuple[1], self.database.sql2PythonTypes(namestuple[2])))
+            datanames.append(Column(namestuple[1], Utils.sql2PythonTypes(namestuple[2])))
         return datanames
+    
+    def dropColumn(self, c):
+        if isinstance(c, Column):
+            name = c.name
+        else:
+            name = c
+        try:
+            self.database.queryExec(f"ALTER TABLE {self.tablename} DROP COLUMN {name}")
+        except Exception as e:
+            return False, str(e)
+            
+    def addColumn(self, c):
+        try:
+            self.database.queryExec(f"ALTER TABLE {self.tablename} ADD {c.name} {c.type}")
+        except Exception as e:
+            return False, str(e)
+
     
     def deleteRow(self, searchName, searchCriteria):
         try:
@@ -42,7 +60,7 @@ class Table:
         
     def insertValues(self, data):
         try:
-            datanames = self.getTableColumnNames()
+            datanames = self.getTableColumns()
 
             if not datanames:
                 return False, "database doesn't exist"

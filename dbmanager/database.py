@@ -26,15 +26,7 @@ class Database:
             finally:
                 cursor.close()
 
-    def sql2PythonTypes(self, text):
-        if text == "INTEGER":
-            return int
-        elif text == "TEXT":
-            return str
-        elif text == "REAL":
-            return float
-        elif text == "BLOB":
-            return bytes
+    
         
         
     def getTableNames(self):
@@ -53,6 +45,7 @@ class Database:
         except Exception as e:
             return False, str(e)
 
+    
             
 
 

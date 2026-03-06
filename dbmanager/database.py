@@ -1,10 +1,12 @@
 from .connpull import ConnectionPull
 from .models import Column
+from .utils import Utils
 
 class Database:
     def __init__(self, database, max_connections=6):
         self.database = database
         self.ConnectionPool = ConnectionPull(database, max_connections)
+        self.Utils = Utils()
 
     def queryExec(self, query, args=()):
         output = ""
@@ -26,7 +28,7 @@ class Database:
             finally:
                 cursor.close()
 
-    
+
         
         
     def getTableNames(self):
@@ -37,6 +39,15 @@ class Database:
         except Exception:
             return None
         
+
+    def tableExists(self, tablename):
+        tables = self.getTableNames()
+        if not tables:
+            return False
+        if tablename in tables:
+            return True
+        else:
+            return False
 
     def dropTable(self, tablename):
         try:
@@ -49,18 +60,11 @@ class Database:
             
 
 
-    def createTable(self, tablename, rows):
+    def createTable(self, tablename, columns):
         itemslist = []
 
-        for item in rows:
-            if item.type == int or item.type == bool:
-                type = "INTEGER"
-            elif item.type == str:
-                type = "TEXT"
-            elif item.type == float:
-                type = "REAL"
-            else:
-                type = "BLOB"
+        for item in columns:
+            type = self.Utils.python2sqlTypes(item.type)
             itemslist.append(f"{item.name} {type}")
 
         qrows = ", ".join(itemslist)

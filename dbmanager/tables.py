@@ -6,6 +6,7 @@ class Table:
     def __init__(self, tablename, database):
         self.tablename = tablename
         self.database = database
+        self.Utils = Utils()
 
     def getValues(self, searchName, searchCriteria):
         try:
@@ -31,7 +32,7 @@ class Table:
             
         datanames = []
         for namestuple in pragmareturn:
-            datanames.append(Column(namestuple[1], Utils.sql2PythonTypes(namestuple[2])))
+            datanames.append(Column(namestuple[1], self.Utils.sql2pythonTypes(namestuple[2])))
         return datanames
     
     def dropColumn(self, c):

@@ -1,4 +1,4 @@
-from dbmanager import Database, Table, Column
+from sqlmanager import Database, Table, Column
 
 #connect to database
 db = Database("example.db")

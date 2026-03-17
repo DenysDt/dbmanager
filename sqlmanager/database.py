@@ -62,10 +62,15 @@ class Database:
 
     def createTable(self, tablename, columns):
         itemslist = []
+        defaults = []
 
         for item in columns:
             type = self.Utils.python2sqlTypes(item.type)
-            itemslist.append(f"{item.name} {type}")
+            if item.type != type(item.default) and item.default:
+                raise ValueError("Column type and default value type doesn't match!")
+            
+            itemslist.append(f"{item.name} {type} {"DEFAULT ?" if item.default else ""}")
+            defaults.append(item.default)
 
         qrows = ", ".join(itemslist)
 
@@ -76,7 +81,7 @@ class Database:
         else:
             try: 
                 query = f"CREATE TABLE {tablename} ({qrows});"
-                self.queryExec(query)
+                self.queryExec(query, tuple(defaults))
                 return True, None
             except Exception as e:
                 return False, str(e)

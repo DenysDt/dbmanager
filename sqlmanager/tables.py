@@ -47,7 +47,10 @@ class Table:
             
     def addColumn(self, c):
         try:
-            self.database.queryExec(f"ALTER TABLE {self.tablename} ADD {c.name} {c.type}")
+            query = f"ALTER TABLE {self.tablename} ADD COLUMN {c.name} {self.Utils.python2sqlTypes(c.type)}"
+            if c.default:
+                query += " DEFAULT ?"
+            self.database.queryExec(query, args=(c.default,))
         except Exception as e:
             return False, str(e)
 
